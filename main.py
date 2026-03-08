@@ -1,12 +1,7 @@
 from cpu import CPU
 
-program = [
-    "MOV A 5",
-    "MOV B 10",
-    "ADD A B",
-    "PRINT A",
-    "HLT"
-]
+with open("program.asm") as f:
+    program = [line.strip() for line in f if line.strip()]
 
 cpu = CPU(program)
 cpu.run()
