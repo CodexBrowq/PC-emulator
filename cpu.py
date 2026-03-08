@@ -1,4 +1,4 @@
-import requests  # do pobierania danych z internetu
+import requests
 
 class CPU:
     def __init__(self, program):
@@ -8,17 +8,16 @@ class CPU:
         self.running = True
 
     def fetch(self):
-        instruction = self.program[self.PC]
+        instr = self.program[self.PC]
         self.PC += 1
-        return instruction
+        return instr
 
     def execute(self, instr):
         parts = instr.split()
         op = parts[0]
 
         if op == "MOV":
-            reg = parts[1]
-            val = int(parts[2])
+            reg, val = parts[1], int(parts[2])
             self.registers[reg] = val
 
         elif op == "ADD":
@@ -34,13 +33,20 @@ class CPU:
             print(self.registers[reg])
 
         elif op == "GET":
-            reg = parts[1]
-            url = parts[2]
+            reg, url = parts[1], parts[2]
             try:
                 response = requests.get(url)
                 self.registers[reg] = len(response.text)  # zapisujemy długość strony
             except:
-                self.registers[reg] = -1  # błąd
+                self.registers[reg] = -1  # błąd pobierania
+
+        elif op == "INPUT":
+            reg, prompt = parts[1], " ".join(parts[2:])
+            val = input(prompt + " ")
+            try:
+                self.registers[reg] = int(val)
+            except:
+                self.registers[reg] = val  # jeśli nie liczba, zapisujemy tekst
 
         elif op == "HLT":
             self.running = False
