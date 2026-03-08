@@ -1,31 +1,19 @@
+import requests  # do pobierania danych z internetu
+
 class CPU:
-    def __init__(self, memory):
-        # Registers
-        self.registers = {
-            "A": 0,
-            "B": 0,
-            "C": 0,
-            "D": 0
-        }
-
-        # Program counter
+    def __init__(self, program):
+        self.registers = {"A": 0, "B": 0, "C": 0, "D": 0}
         self.PC = 0
-
-        # Memory reference
-        self.memory = memory
-
-        # Running state
+        self.program = program
         self.running = True
 
-
     def fetch(self):
-        instruction = self.memory[self.PC]
+        instruction = self.program[self.PC]
         self.PC += 1
         return instruction
 
-
-    def execute(self, instruction):
-        parts = instruction.split()
+    def execute(self, instr):
+        parts = instr.split()
         op = parts[0]
 
         if op == "MOV":
@@ -34,27 +22,33 @@ class CPU:
             self.registers[reg] = val
 
         elif op == "ADD":
-            reg1 = parts[1]
-            reg2 = parts[2]
+            reg1, reg2 = parts[1], parts[2]
             self.registers[reg1] += self.registers[reg2]
 
         elif op == "SUB":
-            reg1 = parts[1]
-            reg2 = parts[2]
+            reg1, reg2 = parts[1], parts[2]
             self.registers[reg1] -= self.registers[reg2]
 
         elif op == "PRINT":
             reg = parts[1]
             print(self.registers[reg])
 
+        elif op == "GET":
+            reg = parts[1]
+            url = parts[2]
+            try:
+                response = requests.get(url)
+                self.registers[reg] = len(response.text)  # zapisujemy długość strony
+            except:
+                self.registers[reg] = -1  # błąd
+
         elif op == "HLT":
             self.running = False
 
         else:
-            print("Unknown instruction:", instruction)
-
+            print("Nieznana instrukcja:", instr)
 
     def run(self):
         while self.running:
-            instruction = self.fetch()
-            self.execute(instruction)
+            instr = self.fetch()
+            self.execute(instr)
