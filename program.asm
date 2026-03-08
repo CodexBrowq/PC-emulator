@@ -1,0 +1,5 @@
+MOV A 5
+MOV B 10
+ADD A B
+PRINT A
+HLT
